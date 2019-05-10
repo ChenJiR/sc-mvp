@@ -58,13 +58,13 @@
             gender:this.gender
           },
         }).then( res => {
-          this.$store.commit('setToken',res.token)
+          // this.$store.commit('setToken',res.token)
+          window.localStorage.setItem('token', res.token)
           this.$router.push('/')
         });
       },
       check_tab(index){
         this.tab_index = index
-        console.log(index)
       }
     }
   }

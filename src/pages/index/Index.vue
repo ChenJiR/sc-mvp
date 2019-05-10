@@ -2,14 +2,23 @@
   <div>
       <search
         :results="results"
-        v-model="value"
+        @on-submit="searchResults"
+        v-model="searchText"
         position="absolute"
         auto-scroll-to-top
-        ref="search"></search>
+        ref="search"
+        @on-result-click="resultClick"
+      ></search>
 
       <div id="content">
 
-        <vue-waterfall-easy :imgsArr="imgsArr" :imgWidth="200" :isRouterLink="true" :mobileGap="9">
+        <vue-waterfall-easy
+          :imgsArr="imgsArr"
+          :imgWidth="200"
+          :isRouterLink="true"
+          :mobileGap="9"
+          @scrollReachBottom="test"
+        >
           <div class="img-info" slot-scope="props">
             <p class="waterfall-item-title">{{props.value.title}}</p>
             <p class="waterfall-item-info">{{props.value.info}}</p>
@@ -23,57 +32,58 @@
 
 <script>
   import { Search,ViewBox,Flexbox,FlexboxItem } from 'vux'
+  import axios from "@/http/axios"
   import vueWaterfallEasy from 'vue-waterfall-easy'
 
   export default {
     components: {
-      Search,
-      vueWaterfallEasy,
-      ViewBox,
-      Flexbox,
-      FlexboxItem
+      Search, vueWaterfallEasy, ViewBox, Flexbox, FlexboxItem
     },
     data() {
       return {
         results:[],
-        value:'',
+        searchText:'',
         imgsArr:[]
       }
     },
     methods:{
       getData(){
-        this.imgsArr = [
-          {
-            'src':'http://img0.imgtn.bdimg.com/it/u=1398135725,1276761355&fm=26&gp=0.jpg',
-            'title':'测试测试测试测试测试测试测试测试测试测试测试测试测试',
-            'info':1,
-            'href':'ArticleContent'
-          },
-          {
-            'src':'http://img5.imgtn.bdimg.com/it/u=1289981276,3794620975&fm=26&gp=0.jpg',
-            'title':'test2',
-            'info':'12312',
-            'href':'ArticleContent'
-          },
-          {
-            'src':'http://img4.imgtn.bdimg.com/it/u=1535802057,2423234359&fm=15&gp=0.jpg',
-            'title':'test3',
-            'info':'12312',
-            'href':'ArticleContent'
-          },
-          {
-            'src':'http://img1.imgtn.bdimg.com/it/u=878709247,2567545902&fm=15&gp=0.jpg',
-            'title':'test4',
-            'info':'12312',
-            'href':'ArticleContent'
-          },
-          {
-            'src':'http://img1.imgtn.bdimg.com/it/u=1658773359,884242240&fm=15&gp=0.jpg',
-            'title':'test5',
-            'info':'12312',
-            'href':'ArticleContent'
-          },
-        ]
+        return axios({
+          url: 'get_article_list',
+          method: 'get'
+        }).then( res => {
+          let data = []
+          res.data.forEach(item => {
+            data.push({
+              'src':JSON.parse(item.img)[0]['url'],
+              'title': item.title.length > 20 ? item.title.substring(0,15) + '...' : item.title,
+              'info': item.content.length > 40 ? item.content.substring(0,30)+'...' : item.content,
+              'href':'ArticleContent/'+item.id,
+            })
+            this.imgsArr = data
+          });
+        });
+      },
+      test(){
+        return true;
+      },
+      searchResults(){
+        return axios({
+          url: 'search',
+          method: 'post',
+          data:{title:this.searchText}
+        }).then( res => {
+          let data = []
+          res.article_list.forEach(
+            function(item){
+              data.push({title:item.title,id:item.id})
+            }
+          )
+          this.results = data
+        });
+      },
+      resultClick(item){
+        this.$router.push('/ArticleContent/'+item.id)
       }
     },
     created() {

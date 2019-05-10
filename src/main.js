@@ -5,6 +5,7 @@ import FastClick from 'fastclick'
 import VueRouter from 'vue-router'
 import App from './App'
 import store from './store'
+import  { AlertPlugin } from 'vux'
 import TabFrame from '@/pages/TabFrame'
 import Index from '@/pages/index/Index'
 import Publish from '@/pages/publish/Publish'
@@ -20,6 +21,8 @@ import { AjaxPlugin } from 'vux'
 Vue.use(AjaxPlugin)
 
 Vue.use(VueRouter)
+
+Vue.use(AlertPlugin)
 
 const routes = [
   {
@@ -53,7 +56,7 @@ const routes = [
     component: ReceiveComment,
   },
   {
-    path:'/ArticleContent',
+    path:'/ArticleContent/:id',
     component: ArticleContent,
   },
   {

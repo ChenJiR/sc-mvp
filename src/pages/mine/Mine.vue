@@ -8,19 +8,20 @@
     <flexbox style="padding: 5px 15px;">
       <flexbox-item :span="4">
         <div class="user-header">
-          <x-icon type="ios-person" size="150" style="fill: #7d8ff7;"></x-icon>
+<!--          <x-icon type="ios-person" size="150" style="fill: #7d8ff7;"></x-icon>-->
+          <img :src="head_img" width="120px" height="120px">
         </div>
       </flexbox-item>
       <flexbox-item>
         <div class="user-info">
-          <card :header="{title:'昵称'}">
-            <p slot="content" class="card-padding">测试昵称</p>
+          <card :header="{title:'昵称:'}">
+            <p slot="content" class="card-padding">{{nick_name}}</p>
           </card>
         </div>
       </flexbox-item>
     </flexbox>
-    <card :header="{title:'个人签名'}" style="margin: 0px">
-      <p slot="content" style="padding: 10px 15px">测试签名</p>
+    <card :header="{title:'个人签名:'}" style="margin: 0px">
+      <p slot="content" style="padding: 10px 15px">{{sign}}</p>
     </card>
 
     <card>
@@ -47,14 +48,33 @@
 
 <script>
   import { Flexbox, FlexboxItem, Card, Divider,XHeader } from 'vux'
-  // import Vue from 'vue'
-  // import VueRouter from 'vue-router'
-
-  // Vue.use(VueRouter)
+  import axios from "@/http/axios"
 
   export default {
     components: {
       Flexbox, FlexboxItem, Card, Divider,XHeader
+    },
+    data(){
+      return {
+        nick_name:'',
+        sign:'',
+        head_img:''
+      }
+    },
+    methods:{
+      getData(){
+        return axios({
+          url: 'get_user_info',
+          method: 'get',
+        }).then( res => {
+          this.nick_name=res.data.nick_name
+          this.sign=res.data.sign
+          this.head_img=res.data.head_img
+        });
+      }
+    },
+    created() {
+      this.getData()
     }
   }
 </script>
